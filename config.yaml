@@ -1,0 +1,28 @@
+# ---------------------------------------------------------------------------
+# 参数说明文件（当前 predict.py 不读取本文件；以命令行和模型文件为准）
+# ---------------------------------------------------------------------------
+data:
+  # 评测数据目录。目录结构与赛事下发的原始数据一致：
+  #   <data_dir>/test/*.csv   或   <data_dir>/*.csv
+  # 每个 csv = 一段 96 h、5 min 采样的多传感器序列（1152 行 × 21 列）
+  dir: ./data
+  pattern: "*.csv"
+
+output:
+  # 提交文件（仅两列：切片ID, 故障判断；不含序号）
+  path: ./result.csv
+
+model:
+  dir: ./models
+  model_file: model.pkl        # CatBoost 排序模型 + 特征列表 + 阈值
+  scaler_file: scaler.pkl      # 标准化用的中位数 / 四分位距
+
+window:
+  rows: 1152                   # 96 h / 5 min
+  step_min: 5
+  sensor_count: 21
+
+decision:
+  # 历史阈值来源记录；实际固定阈值从 model.pkl 读取
+  threshold_source: "分数反馈"
+  rule: "risk > tau -> 1 else 0"
